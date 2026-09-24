@@ -1,0 +1,36 @@
+*.log
+.DS_Store
+.env
+.env.backup
+.env.production
+.env.local
+.phpactor.json
+.phpunit.result.cache
+/.codex
+/.cursor/
+/.idea
+/.nova
+/.phpunit.cache
+/.vscode
+/.zed
+/auth.json
+.claude/settings.local.json
+node_modules
+Thumbs.db
+vscode.deb
+
+# Backend (Laravel)
+/backend/vendor
+/backend/public/build
+/backend/public/fonts-manifest.dev.json
+/backend/public/hot
+/backend/public/storage
+/backend/storage/*.key
+/backend/storage/pail
+_ide_helper.php
+Homestead.json
+Homestead.yaml
+
+# Frontend (Next.js)
+/frontend/.next
+/frontend/out
