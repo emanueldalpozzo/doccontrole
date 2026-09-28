@@ -1,0 +1,107 @@
+---
+title: Pacote Conteudo - respostas colaborativas e controle de versao
+---
+classDiagram
+    direction TB
+
+    class ComponenteSecao {
+        <<abstract>>
+        #String codigo
+        #String titulo
+        #TipoResposta tipoResposta
+    }
+
+    class Relatorio {
+        -String id
+        -String ciclo
+        -StatusRelatorio status
+        -Date prazo
+        -Date criadoEm
+        +progresso() float
+        +respostaDe(ComponenteSecao s) Resposta
+        +pendencias() int
+    }
+
+    class Resposta {
+        <<abstract>>
+        #String id
+        #StatusResposta status
+        #int conceito
+        #int versao
+        #Date atualizadoEm
+        +salvar(Usuario u, int versaoEsperada) void
+        +registrarRevisao(Usuario u) RespostaRevisao
+        +estaPreenchida() bool*
+        +valorParaExibicao() String*
+    }
+
+    class RespostaTexto {
+        -String conteudo
+        +estaPreenchida() bool
+        +valorParaExibicao() String
+    }
+
+    class RespostaTernaria {
+        -ValorTernario valor
+        +estaPreenchida() bool
+        +valorParaExibicao() String
+    }
+
+    class RespostaAnexo {
+        +estaPreenchida() bool
+        +valorParaExibicao() String
+    }
+
+    class RespostaRevisao {
+        -String id
+        -String conteudo
+        -Date criadoEm
+    }
+
+    class Evidencia {
+        -String id
+        -String caminhoArquivo
+        -String tipoMime
+        -int tamanhoBytes
+    }
+
+    class Comentario {
+        -String id
+        -String texto
+        -Date resolvidoEm
+        +resolver() void
+    }
+
+    class StatusResposta {
+        <<enumeration>>
+        RASCUNHO
+        EM_REVISAO
+        APROVADO
+    }
+
+    class ValorTernario {
+        <<enumeration>>
+        SIM
+        NAO
+        NAO_SE_APLICA
+    }
+
+    class GeradorPDF {
+        <<service>>
+        +gerar(Relatorio r) Arquivo
+        -ordenarPorCaminho(List~ComponenteSecao~ s) List~ComponenteSecao~
+    }
+
+    Relatorio "1" *-- "0..*" Resposta : contem
+    Resposta "0..*" --> "1" ComponenteSecao : responde a
+    Resposta <|-- RespostaTexto
+    Resposta <|-- RespostaTernaria
+    Resposta <|-- RespostaAnexo
+    Resposta "1" *-- "0..*" RespostaRevisao : historico
+    Resposta "1" *-- "0..*" Comentario
+    RespostaAnexo "1" *-- "1..*" Evidencia
+    Resposta ..> StatusResposta
+    RespostaTernaria ..> ValorTernario
+    GeradorPDF ..> Relatorio : le
+
+    note for Resposta "versao implementa concorrencia otimista: UPDATE ... WHERE id=? AND versao=? Se 0 linhas afetadas, houve conflito"

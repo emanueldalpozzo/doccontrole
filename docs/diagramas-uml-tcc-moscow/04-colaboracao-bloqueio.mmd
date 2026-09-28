@@ -1,0 +1,65 @@
+---
+title: Pacote Colaboracao - atores, comissao e bloqueio de edicao
+---
+classDiagram
+    direction LR
+
+    class IES {
+        -String id
+        -String nome
+        -String codigoEMEC
+    }
+
+    class ComissaoCPA {
+        -String id
+        -Date mandatoInicio
+        -Date mandatoFim
+        +membros() List~Usuario~
+        +possuiRepresentacaoMinima() bool
+    }
+
+    class Usuario {
+        -String id
+        -String nome
+        -String email
+        -Papel papel
+    }
+
+    class Relatorio {
+        -String id
+        -String ciclo
+        +progresso() float
+    }
+
+    class ComponenteSecao {
+        <<abstract>>
+        #String codigo
+        #String titulo
+    }
+
+    class Bloqueio {
+        -Date adquiridoEm
+        -Date expiraEm
+        +estaExpirado() bool
+        +renovar(int segundos) void
+        +pertenceA(Usuario u) bool
+    }
+
+    class ServicoBloqueio {
+        <<service>>
+        +adquirir(Usuario u, Relatorio r, ComponenteSecao s) Bloqueio
+        +renovar(Bloqueio b) void
+        +liberar(Bloqueio b) void
+        +expirarVencidos() int
+    }
+
+    IES "1" *-- "0..*" ComissaoCPA
+    IES "1" *-- "0..*" Relatorio : elabora
+    ComissaoCPA "1" o-- "3..*" Usuario : membros
+    Bloqueio "0..*" --> "1" Usuario : detido por
+    Bloqueio "0..1" --> "1" Relatorio
+    Bloqueio "0..1" --> "1" ComponenteSecao
+    ServicoBloqueio ..> Bloqueio : gerencia
+
+    note for ComissaoCPA "Agregacao: o Usuario existe independentemente da comissao"
+    note for Bloqueio "Chaveado por (Relatorio, ComponenteSecao), nao por Resposta - a Resposta so existe apos o primeiro salvamento"

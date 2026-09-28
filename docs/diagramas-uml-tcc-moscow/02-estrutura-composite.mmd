@@ -1,0 +1,89 @@
+---
+title: Pacote Estrutura - Padrao Composite aplicado ao instrumento MEC
+---
+classDiagram
+    direction TB
+
+    class Instrumento {
+        -String id
+        -String nome
+        -String orgao
+        -String versao
+        -Date vigenciaInicio
+        +raizes() List~ComponenteSecao~
+        +buscarPorCodigo(String codigo) ComponenteSecao
+        +totalDeNos() int
+    }
+
+    class ComponenteSecao {
+        <<abstract>>
+        #String id
+        #String codigo
+        #String numeracao
+        #String titulo
+        #int ordem
+        #String caminho
+        #int profundidade
+        #TipoSecao tipo
+        #TipoResposta tipoResposta
+        #bool computaConceito
+        #Metadados metadados
+        +aceitaResposta() bool
+        +numeroCompleto() String
+        +estaCompleta(Relatorio r) bool*
+        +contarPendencias(Relatorio r) int*
+        +percorrer(Visitor v) void*
+    }
+
+    class SecaoAgrupadora {
+        -List~ComponenteSecao~ filhos
+        +adicionar(ComponenteSecao c) void
+        +remover(ComponenteSecao c) void
+        +filhos() List~ComponenteSecao~
+        +estaCompleta(Relatorio r) bool
+        +contarPendencias(Relatorio r) int
+        +percorrer(Visitor v) void
+    }
+
+    class SecaoFolha {
+        +estaCompleta(Relatorio r) bool
+        +contarPendencias(Relatorio r) int
+        +percorrer(Visitor v) void
+    }
+
+    class TipoSecao {
+        <<enumeration>>
+        EIXO
+        INDICADOR
+        CRITERIO
+        SUBCRITERIO
+        REQUISITO_LEGAL
+        ITEM_CHECKLIST
+    }
+
+    class TipoResposta {
+        <<enumeration>>
+        NENHUMA
+        TEXTO
+        TERNARIA
+        ANEXO
+    }
+
+    class ImportadorInstrumento {
+        <<service>>
+        +importar(Arquivo csv, String versao) Instrumento
+        -inferirProfundidade(Linha l) int
+        -calcularCaminho(ComponenteSecao pai, int ordem) String
+        -normalizarNumeracao(String bruta) int
+    }
+
+    Instrumento "1" *-- "1..*" ComponenteSecao : define
+    ComponenteSecao <|-- SecaoAgrupadora
+    ComponenteSecao <|-- SecaoFolha
+    SecaoAgrupadora "1" *-- "1..*" ComponenteSecao : filhos
+    ComponenteSecao ..> TipoSecao
+    ComponenteSecao ..> TipoResposta
+    ImportadorInstrumento ..> Instrumento : cria
+
+    note for SecaoAgrupadora "Composite: delega estaCompleta() e contarPendencias() aos filhos"
+    note for SecaoFolha "Leaf: avalia apenas a propria Resposta"

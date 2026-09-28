@@ -18,6 +18,8 @@
 node_modules
 Thumbs.db
 vscode.deb
+CLAUDE.md
+AGENTS.md
 
 # Backend (Laravel)
 /backend/vendor

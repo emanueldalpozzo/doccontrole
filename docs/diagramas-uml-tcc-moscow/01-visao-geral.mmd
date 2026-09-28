@@ -1,0 +1,88 @@
+---
+title: Visao geral do modelo de dominio
+---
+classDiagram
+    direction TB
+
+    class IES {
+        -String nome
+        -String codigoEMEC
+    }
+    class ComissaoCPA {
+        -Date mandatoInicio
+        -Date mandatoFim
+    }
+    class Usuario {
+        -String nome
+        -Papel papel
+    }
+    class Instrumento {
+        -String versao
+        -Date vigenciaInicio
+    }
+    class ComponenteSecao {
+        <<abstract>>
+        #String codigo
+        #String caminho
+        #int ordem
+        #TipoResposta tipoResposta
+        +estaCompleta(Relatorio r) bool*
+    }
+    class SecaoAgrupadora {
+        -List~ComponenteSecao~ filhos
+    }
+    class SecaoFolha
+    class Relatorio {
+        -String ciclo
+        -StatusRelatorio status
+    }
+    class Resposta {
+        <<abstract>>
+        #StatusResposta status
+        #int versao
+        +estaPreenchida() bool*
+    }
+    class RespostaTexto {
+        -String conteudo
+    }
+    class RespostaTernaria {
+        -ValorTernario valor
+    }
+    class RespostaAnexo
+    class RespostaRevisao {
+        -String conteudo
+        -Date criadoEm
+    }
+    class Evidencia {
+        -String caminhoArquivo
+    }
+    class Comentario {
+        -String texto
+    }
+    class Bloqueio {
+        -Date expiraEm
+    }
+
+    IES "1" *-- "0..*" ComissaoCPA
+    IES "1" *-- "0..*" Relatorio : elabora
+    ComissaoCPA "1" o-- "3..*" Usuario : membros
+
+    Instrumento "1" *-- "1..*" ComponenteSecao : define
+    ComponenteSecao <|-- SecaoAgrupadora
+    ComponenteSecao <|-- SecaoFolha
+    SecaoAgrupadora "1" *-- "1..*" ComponenteSecao : filhos
+
+    Relatorio "0..*" --> "1" Instrumento : avaliado segundo
+    Relatorio "1" *-- "0..*" Resposta : contem
+    Resposta "0..*" --> "1" ComponenteSecao : responde a
+    Resposta <|-- RespostaTexto
+    Resposta <|-- RespostaTernaria
+    Resposta <|-- RespostaAnexo
+    Resposta "1" *-- "0..*" RespostaRevisao : historico
+    Resposta "1" *-- "0..*" Comentario
+    RespostaAnexo "1" *-- "1..*" Evidencia
+    Resposta "0..*" --> "0..1" Usuario : responsavel
+
+    Bloqueio "0..1" --> "1" Relatorio
+    Bloqueio "0..1" --> "1" ComponenteSecao
+    Bloqueio "0..*" --> "1" Usuario : detido por
