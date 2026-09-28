@@ -40,3 +40,6 @@ Monorepo com front-end e back-end desacoplados:
 ## Status
 
 O projeto é baseado no desenvolvimento do Trabalho de Conclusão de Curso / Prática de Implementação sendo reaproveitado a ideia para a matéria de Desenvolvimento de Aplicações Backend com Framework. Este repositório é evoluído ao longo do semestre até o Checkpoint Final.
+
+Link video
+https://youtu.be/enFl9f1YKXo
